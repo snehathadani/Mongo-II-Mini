@@ -6,6 +6,7 @@ const Person = require('./models.js');
 const port = process.env.PORT || 3000;
 
 const server = express();
+require('./db/connection.js');
 
 // error status code constants
 const STATUS_SERVER_ERROR = 500;
@@ -15,15 +16,22 @@ server.use(bodyParser.json());
 
 // Your API will be built out here. write a 'get' request to '/users' that simply returns all the peopel.
 
-server.get('/users', (req, res)=> {
-Person.find({}, (err, users) =>{
-  if (err) {
-    res.status(STATUS_SERVER_ERROR).json({'Error getting your users' : error});
-    return;
-  }
+server.get('/users', (req, res) => {
+Person.find({})
+.then ((users) =>{
   res.json(users);
+})
+.catch((error) => {
+  res.status(STATUS_SERVER_ERROR).json({'Error getting your users' : error});
+  return;
+})
 });
-});
+/*server.get('/users', function(req,res){
+  Person.find().then(function(users){
+    res.status(200).json(users);
+  });
+});*/
+
 server.get('/users/:direction', (req, res)=> {
   const { direction } = req.params;// asc or desc
   Person.find({})
@@ -64,19 +72,8 @@ server.put ('/users/:id', (req, res) => {
   
   });
 });
-mongoose.Promise = global.Promise;
-const connect = mongoose.connect('mongodb://localhost/people', {
-  useMongoClient: true
-});
+
 /* eslint no-console: 0 */
-connect.then(
-  () => {
-    server.listen(port);
-    console.log(`Server Listening on ${port}`);
-  },
-  err => {
-    console.log('\n************************');
-    console.log("ERROR: Couldn't connect to MongoDB. Do you have it running?");
-    console.log('************************\n');
-  }
-);
+
+    server.listen(port, ()=> console.log('API running'));
+   

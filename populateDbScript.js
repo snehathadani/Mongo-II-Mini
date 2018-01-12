@@ -13,7 +13,6 @@ const populate = () => {
     const promises = allPeople.map(p => new Person(p).save());
     return Promise.all(promises);
   };
-
   return populatePeople()
     .then(() => {
       console.log('done');
